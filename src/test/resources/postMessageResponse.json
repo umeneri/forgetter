@@ -1,0 +1,37 @@
+{
+  "ok":true,
+  "channel":"CEGP204QK",
+  "ts":"1558845961.000100",
+  "message":{
+    "type":"message",
+    "subtype":"bot_message",
+    "text":"I hope the tour went well, Mr. Wonka.",
+    "ts":"1558845961.000100",
+    "username":"forgetter",
+    "bot_id":"BJTL4THAM",
+    "attachments":[
+      {
+        "callback_id":"select_simple_1234",
+        "fallback":"You could be telling the computer exactly what it can do with a lifetime supply of chocolate.",
+        "text":"Who wins the lifetime supply of chocolate?",
+        "id":1,
+        "color":"3AA3E3",
+        "actions":[
+          {
+            "id":"1",
+            "name":"winners_list",
+            "text":"Who should win?",
+            "type":"select",
+            "data_source":"users"
+          }
+        ]
+      }
+    ]
+  },
+  "warning":"missing_charset",
+  "response_metadata":{
+    "warnings":[
+      "missing_charset"
+    ]
+  }
+}
