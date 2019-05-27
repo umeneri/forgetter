@@ -29,11 +29,16 @@ case class SlackClient() {
     }
   }
 
-  def postMessage(text: String): Future[Json] = {
+  def postMessage(channel: String, text: String): Future[Json] = {
     val endpoint = "chat.postMessage"
+    val json = s"""{"channel": "$channel", "text": "$text"}"""
+
+    makeJsonRequest(endpoint, json)
+  }
+
+  private def makeJsonRequest(endpoint: String, json: String): Future[Json] = {
     val url = s"https://slack.com/api/$endpoint"
     val token = System.getenv("OAUTH2TOKEN")
-    val json = s"""{"channel": "slacktest", "text": "$text"}"""
     val request = HttpRequest(
       uri = url,
       method = HttpMethods.POST,

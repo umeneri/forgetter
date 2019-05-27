@@ -18,7 +18,7 @@ class SlackClientSpec extends WordSpec with Matchers with ScalaFutures {
     }
 
     "post message" in {
-      val res: Json = slackClient.postMessage("test").futureValue(limit)
+      val res: Json = slackClient.postMessage("slacktest", "test").futureValue(limit)
 
       val ok = res.\\("ok").head.asBoolean.get
       ok shouldBe true
