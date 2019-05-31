@@ -31,7 +31,7 @@ class SlackClientSpec extends WordSpec with Matchers with ScalaFutures {
     "challenge" in {
       val slackEventEntity = """{"token":"Jhj5dZrVaK7ZwHHjRyZWjbDl","challenge":"3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P","type":"url_verification"}"""
       val json = parse(slackEventEntity).right.getOrElse(Json.Null)
-      val challenge = slackClient.challenge(json)
+      val challenge = slackClient.verification(json)
       challenge shouldBe "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"
     }
   }

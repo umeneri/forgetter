@@ -35,7 +35,7 @@ case class SlackClient() {
     makeJsonRequest(endpoint, json)
   }
 
-  def challenge(json: Json): String = {
+  def verification(json: Json): String = {
     (json \\ "challenge").headOption.flatMap(_.asString).getOrElse("")
   }
 
