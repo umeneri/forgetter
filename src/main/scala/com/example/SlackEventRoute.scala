@@ -6,10 +6,10 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.post
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.Json
-import io.circe.parser._
 
-trait SlackEventRoute extends JsonSupport {
+trait SlackEventRoute extends FailFastCirceSupport {
   implicit def system: ActorSystem
 
   lazy val log = Logging(system, classOf[String])
@@ -21,9 +21,8 @@ trait SlackEventRoute extends JsonSupport {
       pathPrefix("event") {
         pathEnd {
           post {
-            entity(as[String]) { string =>
-              val json = parse(string).right.getOrElse(Json.Null)
-              log.info(string)
+            entity(as[Json]) { json =>
+              log.info(json.toString())
 
               if ((json \\ "type").headOption.flatMap(_.asString).getOrElse("") == "url_verification") {
                 log.info("challenge")
