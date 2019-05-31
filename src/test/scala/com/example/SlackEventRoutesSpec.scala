@@ -13,15 +13,12 @@ class SlackEventRoutesSpec extends WordSpec with Matchers with ScalaFutures with
 
   "SlackEventRoute" should {
     "verification" in {
-//      val slackEvent = SlackEvent("Kapi", 42, "jp")
-//      val slackEventEntity = Marshal(slackEvent).to[SlackEvent].futureValue
-      val slackEventEntity = """{"token":"Jhj5dZrVaK7ZwHHjRyZWjbDl","challenge":"3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P",
-"type":"url_verification"}"""
+      val slackEventEntity = """{"token":"Jhj5dZrVaK7ZwHHjRyZWjbDl","challenge":"3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P","type":"url_verification"}"""
       val request = Post("/slack/event").withEntity(slackEventEntity)
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
-//        entityAs[String] should ===("""{"users":[]}""")
+        entityAs[String] should ===("3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P")
       }
     }
   }

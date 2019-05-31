@@ -1,6 +1,7 @@
 package com.example
 
 import io.circe.Json
+import io.circe.parser._
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{Matchers, WordSpec}
@@ -25,6 +26,13 @@ class SlackClientSpec extends WordSpec with Matchers with ScalaFutures {
 
       val text = res.hcursor.downField("message").downField("text").as[String].right.get
       text shouldBe "test"
+    }
+
+    "challenge" in {
+      val slackEventEntity = """{"token":"Jhj5dZrVaK7ZwHHjRyZWjbDl","challenge":"3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P","type":"url_verification"}"""
+      val json = parse(slackEventEntity).right.getOrElse(Json.Null)
+      val challenge = slackClient.challenge(json)
+      challenge shouldBe "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"
     }
   }
 }

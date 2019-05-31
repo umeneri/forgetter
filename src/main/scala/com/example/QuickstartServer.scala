@@ -1,15 +1,15 @@
 package com.example
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 
-object QuickstartServer extends App with UserRoutes {
+object QuickstartServer extends App with SlackEventRoute {
 
   // set up ActorSystem and other dependencies here
   implicit val system: ActorSystem = ActorSystem("helloAkkaHttpServer")
@@ -19,7 +19,7 @@ object QuickstartServer extends App with UserRoutes {
   val userRegistryActor: ActorRef = system.actorOf(UserRegistryActor.props, "userRegistryActor")
 
   // from the UserRoutes trait
-  lazy val routes: Route = userRoutes
+  lazy val routes: Route = slackEventRoute
 
   val serverBinding: Future[Http.ServerBinding] = Http().bindAndHandle(routes, "localhost", 8080)
 
