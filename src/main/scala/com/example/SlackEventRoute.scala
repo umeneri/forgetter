@@ -14,6 +14,8 @@ trait SlackEventRoute extends JsonSupport {
 
   lazy val log = Logging(system, classOf[String])
 
+  val slackClient = SlackClient()
+
   lazy val slackEventRoute: Route =
     pathPrefix("slack") {
       pathPrefix("event") {
@@ -21,13 +23,25 @@ trait SlackEventRoute extends JsonSupport {
           post {
             entity(as[String]) { string =>
               val json = parse(string).right.getOrElse(Json.Null)
+              log.info(string)
 
               if ((json \\ "type").headOption.flatMap(_.asString).getOrElse("") == "url_verification") {
                 log.info("challenge")
-                complete(SlackClient().verifyToken(json))
+                complete(slackClient.verifyToken(json))
               } else {
                 log.info("else")
-                complete("Ok")
+
+                val username = (json \\ "username").headOption.flatMap(_.asString).getOrElse("")
+                if (username != "forgetter") {
+                  val eventualJson = slackClient.postMessage("slacktest", "response")
+
+                  onSuccess(eventualJson) { _ =>
+                    log.info("success")
+                    complete("Ok")
+                  }
+                } else {
+                  complete("Ok")
+                }
               }
             }
           }
