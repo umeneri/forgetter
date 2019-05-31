@@ -24,7 +24,7 @@ trait SlackEventRoute extends JsonSupport {
 
               if ((json \\ "type").headOption.flatMap(_.asString).getOrElse("") == "url_verification") {
                 log.info("challenge")
-                complete(SlackClient().verification(json))
+                complete(SlackClient().verifyToken(json))
               } else {
                 log.info("else")
                 complete("Ok")
