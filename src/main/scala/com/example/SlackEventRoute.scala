@@ -21,30 +21,26 @@ trait SlackEventRoute extends FailFastCirceSupport {
       pathPrefix("event") {
         pathEnd {
           post {
-            entity(as[Json]) { json =>
-              log.info(json.toString())
-
-              if ((json \\ "type").headOption.flatMap(_.asString).getOrElse("") == "url_verification") {
-                log.info("challenge")
-                complete(slackClient.verifyToken(json))
-              } else {
-                log.info("else")
-
-                val username = (json \\ "username").headOption.flatMap(_.asString).getOrElse("")
-                if (username != "forgetter") {
-                  val eventualJson = slackClient.postMessage("slacktest", "response")
-
-                  onSuccess(eventualJson) { _ =>
-                    log.info("success")
-                    complete("Ok")
-                  }
-                } else {
+            entity(as[Json]) {
+              case json if isVerification(json) => complete(slackClient.verifyToken(json))
+              case json if isUserMessage(json) =>
+                val eventualJson = slackClient.postMessage("slacktest", "response")
+                onSuccess(eventualJson) { json =>
+                  log.info(json.toString())
                   complete("Ok")
                 }
-              }
+              case _ => complete("Ok")
             }
           }
         }
       }
     }
+
+  private def isVerification(json: Json): Boolean = {
+    (json \\ "type").headOption.flatMap(_.asString).getOrElse("") == "url_verification"
+  }
+
+  private def isUserMessage(json: Json) = {
+    (json \\ "username").headOption.flatMap(_.asString).getOrElse("") != "forgetter"
+  }
 }

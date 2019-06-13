@@ -19,8 +19,9 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
       "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,
       "com.typesafe.akka" %% "akka-stream-testkit"  % akkaVersion     % Test,
-      "org.scalatest"     %% "scalatest"            % "3.0.5"         % Test
-    ),
+      "org.scalatest"     %% "scalatest"            % "3.0.5"         % Test,
+      "org.mockito"       %% "mockito-scala"        % "1.5.7"         % Test
+),
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core",
       "io.circe" %% "circe-generic",
