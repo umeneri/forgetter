@@ -9,8 +9,12 @@ import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.Json
 
+import scala.concurrent.Future
+
 trait SlackEventRoute extends FailFastCirceSupport
-  with ChallengeEventFormatter {
+  with ChallengeEventFormatter
+  with CallbackEventFormatter {
+
   implicit def system: ActorSystem
 
   lazy val log = Logging(system, classOf[String])
@@ -24,30 +28,21 @@ trait SlackEventRoute extends FailFastCirceSupport
           post {
             entity(as[ChallengeEvent]) { event =>
               complete(slackClient.verifyChallengeToken(event))
-              //              case json
-              //              if isVerification(json)
-              //              => complete(slackClient.verifyToken(json))
-              //              case json
-              //              if isUserMessage(json)
-              //              =>
-              //              val eventualJson = slackClient.postMessage("slacktest", "response")
-              //              onSuccess(eventualJson) { json =>
-              //                log.info(json.toString())
-              //                complete("Ok")
-              //              }
-              //              case _ => complete("Ok")
-            }
-            //            ~
-            //              entity(as[CallbackEvent]) { event =>
-            //          complete("Ok")
-            //              }
-
+            } ~
+              entity(as[CallbackEvent]) { callbackEvent =>
+                callbackEvent.event match {
+                  case v: MessageSlackEvent =>
+                    onSuccess(replyEchoResponse(v)) { _ => complete("Ok") }
+                  case _: BotMessageSlackEvent => complete("Ok")
+                }
+              }
           }
         }
       }
     }
 
-  private def isUserMessage(json: Json): Boolean = {
-    (json \\ "username").headOption.flatMap(_.asString).getOrElse("") != "forgetter"
+  private def replyEchoResponse(event: MessageSlackEvent): Future[Json] = {
+    val testChannel = "slacktest"
+    slackClient.postMessage(channel = testChannel, text = event.text)
   }
 }

@@ -7,7 +7,7 @@ final case class ChallengeEvent(token: String, challenge: String, `type`: String
 final case class CallbackEvent(token: String,
                                team_id: String,
                                api_app_id: String,
-                               event: MessageSlackEvent,
+                               event: SlackEvent,
                                `type`: String,
                                authed_teams: Option[Seq[String]],
                                authed_users: Option[Seq[String]],
@@ -26,15 +26,80 @@ case class MessageSlackEvent(
                                 text: String)
   extends SlackEvent
 
+case class BotMessageSlackEvent(
+                                   `type`: String,
+                                   subtype: String,
+                                   text: String,
+                                   ts: String,
+                                   username: String,
+                                   bot_id: String,
+                                   channel: String,
+                                   event_ts: String,
+                                   channel_type: String,
+                               )
+  extends SlackEvent
+
+
 trait ChallengeEventFormatter {
   implicit val ChallengeEventDecoder: Decoder[ChallengeEvent] = deriveDecoder[ChallengeEvent]
   implicit val ChallengeEventEncoder: Encoder[ChallengeEvent] = deriveEncoder[ChallengeEvent]
 }
 
 trait CallbackEventFormatter {
+//  implicit val SlackEventDecoder: Decoder[SlackEvent] = deriveDecoder[SlackEvent]
+  implicit val SlackEventEncoder: Encoder[SlackEvent] = deriveEncoder[SlackEvent]
+  implicit val BotMessageSlackEventDecoder: Decoder[BotMessageSlackEvent] = deriveDecoder[BotMessageSlackEvent]
+  implicit val BotMessageSlackEventEncoder: Encoder[BotMessageSlackEvent] = deriveEncoder[BotMessageSlackEvent]
   implicit val MessageSlackEventDecoder: Decoder[MessageSlackEvent] = deriveDecoder[MessageSlackEvent]
   implicit val MessageSlackEventEncoder: Encoder[MessageSlackEvent] = deriveEncoder[MessageSlackEvent]
+    implicit val CallbackEventEncoder: Encoder[CallbackEvent] = deriveEncoder[CallbackEvent]
   implicit val CallbackEventDecoder: Decoder[CallbackEvent] = deriveDecoder[CallbackEvent]
-  implicit val CallbackEventEncoder: Encoder[CallbackEvent] = deriveEncoder[CallbackEvent]
+
+//  implicit def CallbackEventDecoder: Decoder[CallbackEvent] = Decoder.instance { h =>
+//    (for {
+//      keys <- h.event
+//      key <- keys.dropWhile(_ == "count").headOption
+//    } yield {
+//      for {
+//        count <- h.get[Int]("count")
+//        keyValue <- h.get[String](key)
+//      } yield KeyValueRow(count.toInt, keyValue)
+//    }).getOrElse(Left(DecodingFailure("Not a valid KeyValueRow", List())))
+//  }
+
+//  implicit val CallbackEventDecoder: Decoder[CallbackEvent] = new Decoder[CallbackEvent] {
+//    final def apply(c: HCursor): Decoder.Result[CallbackEvent] =
+//      for {
+//        token <- c.downField("token").as[String]
+//        team_id <- c.downField("team_id").as[String]
+//        api_app_id <- c.downField("api_app_id").as[String]
+//        event <- c.downField("event").as[SlackEvent]
+//        team_id <- c.downField("team_id").as[String]
+//        team_id <- c.downField("team_id").as[String]
+//      } yield {
+//        new Thing(foo, bar)
+//      }
+//  }
+
+  implicit val SlackEventDecoder: Decoder[SlackEvent] = (c: HCursor) => {
+    c.downField("type").as[String].right.getOrElse("") match {
+      case "message" => c.as[MessageSlackEvent]
+      case "bot_message" => c.as[BotMessageSlackEvent]
+      case _ => c.as[MessageSlackEvent]
+    }
+  }
+
+//  implicit def jsonDecoder: Decoder[KeyValueRow] = Decoder.instance { h =>
+//    (for {
+//      keys <- h.keys
+//      key <- keys.dropWhile(_ == "count").headOption
+//    } yield {
+//      for {
+//        count <- h.get[Int]("count")
+//        keyValue <- h.get[String](key)
+//      } yield KeyValueRow(count.toInt, keyValue)
+//    }).getOrElse(Left(DecodingFailure("Not a valid KeyValueRow", List())))
+//  }
+
 }
 

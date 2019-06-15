@@ -16,9 +16,39 @@ class CallbackEventFormatterSpec extends WordSpec
   with CallbackEventFormatter {
 
   "CallbackEventFormatterSpec" should {
+    "decode SlackEvent" in {
+      val slackEventEntity =
+        """
+          |    {
+          |        "type": "message",
+          |        "channel": "C024BE91L",
+          |        "user": "U2147483697",
+          |        "text": "Live long and prospect.",
+          |        "ts": "1355517523.000005",
+          |        "event_ts": "1355517523.000005",
+          |        "channel_type": "channel"
+          |    }
+          |""".stripMargin
+
+      val event = decode[SlackEvent](slackEventEntity)
+
+      val expected = MessageSlackEvent(
+        `type` = "message",
+        event_ts = "1355517523.000005",
+        user = "U2147483697",
+        ts = "1355517523.000005",
+        channel = "C024BE91L",
+        channel_type = "channel",
+        text = "Live long and prospect."
+      )
+
+      event.right.get shouldBe expected
+    }
+
     "decode" in {
       val slackEventEntity =
-        """{
+        """
+        {
           |    "token": "one-long-verification-token",
           |    "team_id": "T061EG9R6",
           |    "api_app_id": "A0PNCHHK2",
