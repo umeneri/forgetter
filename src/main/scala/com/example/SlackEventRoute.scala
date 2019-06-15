@@ -9,7 +9,8 @@ import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.Json
 
-trait SlackEventRoute extends FailFastCirceSupport {
+trait SlackEventRoute extends FailFastCirceSupport
+  with ChallengeEventFormatter {
   implicit def system: ActorSystem
 
   lazy val log = Logging(system, classOf[String])
@@ -21,26 +22,32 @@ trait SlackEventRoute extends FailFastCirceSupport {
       pathPrefix("event") {
         pathEnd {
           post {
-            entity(as[Json]) {
-              case json if isVerification(json) => complete(slackClient.verifyToken(json))
-              case json if isUserMessage(json) =>
-                val eventualJson = slackClient.postMessage("slacktest", "response")
-                onSuccess(eventualJson) { json =>
-                  log.info(json.toString())
-                  complete("Ok")
-                }
-              case _ => complete("Ok")
+            entity(as[ChallengeEvent]) { event =>
+              complete(slackClient.verifyChallengeToken(event))
+              //              case json
+              //              if isVerification(json)
+              //              => complete(slackClient.verifyToken(json))
+              //              case json
+              //              if isUserMessage(json)
+              //              =>
+              //              val eventualJson = slackClient.postMessage("slacktest", "response")
+              //              onSuccess(eventualJson) { json =>
+              //                log.info(json.toString())
+              //                complete("Ok")
+              //              }
+              //              case _ => complete("Ok")
             }
+            //            ~
+            //              entity(as[CallbackEvent]) { event =>
+            //          complete("Ok")
+            //              }
+
           }
         }
       }
     }
 
-  private def isVerification(json: Json): Boolean = {
-    (json \\ "type").headOption.flatMap(_.asString).getOrElse("") == "url_verification"
-  }
-
-  private def isUserMessage(json: Json) = {
+  private def isUserMessage(json: Json): Boolean = {
     (json \\ "username").headOption.flatMap(_.asString).getOrElse("") != "forgetter"
   }
 }

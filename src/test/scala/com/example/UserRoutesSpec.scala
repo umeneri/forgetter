@@ -19,7 +19,7 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
 
   lazy val routes: Route = userRoutes
 
-  
+
   "UserRoutes" should {
     "return no users if no present (GET /users)" in {
       // note that there's no need for the host part in the uri:
@@ -53,7 +53,7 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
         entityAs[String] should ===("""{"description":"User Kapi created."}""")
       }
     }
-    
+
     "be able to remove users (DELETE /users)" in {
       // user the RequestBuilding DSL provided by ScalatestRouteSpec:
       val request = Delete(uri = "/users/Kapi")

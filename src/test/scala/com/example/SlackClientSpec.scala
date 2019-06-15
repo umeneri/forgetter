@@ -6,7 +6,8 @@ import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{Matchers, WordSpec}
 
-class SlackClientSpec extends WordSpec with Matchers with ScalaFutures {
+class SlackClientSpec extends WordSpec with Matchers with ScalaFutures
+  with ChallengeEventFormatter {
   val slackClient = SlackClient()
   val limit: PatienceConfiguration.Timeout = timeout(Span(3, Seconds))
 
@@ -30,8 +31,8 @@ class SlackClientSpec extends WordSpec with Matchers with ScalaFutures {
 
     "challenge" in {
       val slackEventEntity = """{"token":"Jhj5dZrVaK7ZwHHjRyZWjbDl","challenge":"3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P","type":"url_verification"}"""
-      val json = parse(slackEventEntity).right.getOrElse(Json.Null)
-      val challenge = slackClient.verifyToken(json)
+      val challengeEvent = decode[ChallengeEvent](slackEventEntity).right.get
+      val challenge = slackClient.verifyChallengeToken(challengeEvent)
       challenge shouldBe "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"
     }
   }

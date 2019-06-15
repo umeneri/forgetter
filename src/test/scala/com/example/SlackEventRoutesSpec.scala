@@ -21,7 +21,7 @@ class SlackEventRoutesSpec extends WordSpec
 
   lazy val routes: Route = slackEventRoute
   override val slackClient: SlackClient = mock[SlackClient]
-  when(slackClient.verifyToken(any[Json])).thenReturn("3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P")
+  when(slackClient.verifyChallengeToken(any[ChallengeEvent])).thenReturn("3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P")
   when(slackClient.postMessage(any[String], any[String])).thenReturn(Future.successful(Json.Null))
 
   "SlackEventRoute" should {
@@ -70,5 +70,4 @@ class SlackEventRoutesSpec extends WordSpec
     }
   }
 }
-
 
