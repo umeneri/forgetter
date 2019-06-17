@@ -39,13 +39,12 @@ class CallbackEventFormatterSpec extends WordSpec
         ts = "1355517523.000005",
         channel = "C024BE91L",
         channel_type = "channel",
-        text = "Live long and prospect."
-      )
+        text = "Live long and prospect.")
 
       event.right.get shouldBe expected
     }
 
-    "decode" in {
+    "decode message" in {
       val slackEventEntity =
         """
         {
@@ -83,16 +82,66 @@ class CallbackEventFormatterSpec extends WordSpec
           text = "Live long and prospect.",
           ts = "1355517523.000005",
           event_ts = "1355517523.000005",
-          channel_type = "channel"
-        ),
+          channel_type = "channel"),
         `type` = "event_callback",
         authed_teams = Some(Seq("T061EG9R6")),
         authed_users = None,
         event_id = "Ev0PV52K21",
-        event_time = 1355517523
-      )
+        event_time = 1355517523)
 
       event.right.get shouldBe expected
+    }
+
+    "decode bot message" in {
+      val botMessageSlackEventRaw =
+        """
+          |{
+          |    "token": "ihh0xkJmlRdlmsTH8wSbtTZJ",
+          |    "team_id": "TEGP2017V",
+          |    "api_app_id": "AJ9KTJNE7",
+          |    "event": {
+          |        "type": "message",
+          |        "subtype": "bot_message",
+          |        "text": "aaa",
+          |        "ts": "1560580767.001000",
+          |        "username": "forgetter",
+          |        "bot_id": "BJTL4THAM",
+          |        "channel": "CEGP204QK",
+          |        "event_ts": "1560580767.001000",
+          |        "channel_type": "channel"
+          |    },
+          |    "type": "event_callback",
+          |    "event_id": "EvKKL7E56G",
+          |    "event_time": 1560580767,
+          |    "authed_users": [
+          |        "UK261L37G"
+          |    ]
+          |}
+        """.stripMargin
+
+      val expected = CallbackEvent(
+        token = "ihh0xkJmlRdlmsTH8wSbtTZJ",
+        team_id = "TEGP2017V",
+        api_app_id = "AJ9KTJNE7",
+        event = BotMessageSlackEvent(
+          `type` = "message",
+          subtype = "bot_message",
+          channel = "CEGP204QK",
+          username = "forgetter",
+          bot_id = "BJTL4THAM",
+          text = "aaa",
+          ts = "1560580767.001000",
+          event_ts = "1560580767.001000",
+          channel_type = "channel"),
+        `type` = "event_callback",
+        authed_teams = None,
+        authed_users = Some(Seq("UK261L37G")),
+        event_id = "EvKKL7E56G",
+        event_time = 1560580767)
+
+      val json = decode[CallbackEvent](botMessageSlackEventRaw).right.get
+      json shouldBe expected
+
     }
   }
 
