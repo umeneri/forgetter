@@ -1,10 +1,10 @@
-package com.example
+package forgetter
 
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import io.circe.parser.decode
-import org.mockito.{ ArgumentMatchersSugar, MockitoSugar }
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 class ChallengeEventFormatterSpec extends WordSpec
   with Matchers
