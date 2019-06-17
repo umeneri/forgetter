@@ -1,4 +1,4 @@
-package com.example
+package forgetter
 
 import akka.actor.ActorSystem
 import akka.event.Logging

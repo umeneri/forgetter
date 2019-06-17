@@ -1,16 +1,16 @@
-package com.example
+package forgetter
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
-import io.circe.{ Json, ParsingFailure }
 import io.circe.parser._
+import io.circe.{Json, ParsingFailure}
 
 import scala.collection.immutable
-import scala.concurrent.{ ExecutionContextExecutor, Future }
-import akka.http.scaladsl.model.headers._
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 case class SlackClient() {
   implicit val system: ActorSystem = ActorSystem()

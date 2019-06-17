@@ -1,4 +1,4 @@
-package com.example
+package forgetter
 
 import io.circe.Json
 import io.circe.parser._
